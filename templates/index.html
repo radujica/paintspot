@@ -1,0 +1,37 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Raleway -->
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,500' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+    <div id="messages">
+        <p class="id">Visitor</p>
+        <p class="message" id="visitor_message"> - </p>
+        <p class="id">Museum Docent</p>
+        <p class="message" id="assistant_message"> - </p>
+    </div>
+
+    <form autocomplete="off"><input placeholder="Write to the Museum Docent" autocomplete="false" type="text" x-webkit-speech></form>
+    
+<!--     <div id="cameraButton">
+        <input type="file" accept="image/*;capture=camera">
+    </div> -->
+    
+    <div id="recordButton">
+        <button id="inactiveStatus" class="status" onclick="record()"><img src=""></button>
+        <img id="activeStatus" class="status" src=""></img>
+    </div>
+
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+    <script src="{{ url_for('static', filename='js/lodash.core.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
