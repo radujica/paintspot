@@ -12,6 +12,10 @@ pandas = "*"
 scikit-learn = "*"
 matplotlib = "*"
 flask = "*"
+tensorflow = "*"
+pillow = "*"
+jupyter = "*"
+watson-developer-cloud = "*"
 
 
 [dev-packages]
