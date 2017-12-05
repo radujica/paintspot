@@ -1,5 +1,10 @@
 from flask import Flask, render_template, jsonify, request, url_for
+from scipy.misc import imread, imresize
+import io, base64
+from PIL import Image
 import logging
+
+from object_detector import ObjectDetector
 
 app = Flask(__name__)
 
@@ -9,14 +14,16 @@ log.setLevel(logging.ERROR)
 class MuseumAssistant():
     def __init__(self): pass
 
-
     def get_response(self, message):
         return "I don't understand."
 
+    def detect_objects(self, img):
+        return "This is an image"
 
 
 assistant = MuseumAssistant()
-
+#object_detector = ObjectDetector()
+object_detector = None
 
 # Generate the landing page
 @app.route("/")
@@ -26,13 +33,28 @@ def index():
 # Receives the user input => generates response
 @app.route('/_communication', methods= ['GET'])
 def handle_text_input():
-    input_text = request.args.get('text_input', 0, type=str)
+    input_text = request.args.get('text', 0, type=str)
     print ("User message: %s"  % input_text)
     response = assistant.get_response(input_text)
     print ("Assistant response: %s" % response)
     return jsonify(assistant_message=response)
 
+# Receives the path to image => detects objects in image
+@app.route('/_detect_objects', methods= ['GET'])
+def handle_photo_input():
+    data = request.args.get('text', 0, type=str)
+    img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))
+    print ("Provided filepath: %s"  % data)
+    #objects = object_detector.detect_objects([img])
+    objects = []
+    if 'person' in objects:
+        response = "Person found."
+    else:
+        response = "No person found in the image."
+    print ("Assistant response: %s" % response)
+    return jsonify(assistant_message=response)
+
 if __name__ == "__main__":
     # Set host address so that the server is accessible network wide
-    #app.run(host='0.0.0.0', port="5050")
+    # app.run(host='0.0.0.0', port="5050")
     app.run(port="5050")

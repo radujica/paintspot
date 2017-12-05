@@ -229,5 +229,60 @@ input[type="text"]
     #icon{
         display: none;
     }
+}
 
+#cameraModeButton {
+    position: absolute;
+    top: 30px;
+    left: 20px;
+    width: 80px;
+    height: 80px;
+    z-index: 10;
+    border-radius: 50%;
+    border: 2px solid black;
+    cursor: pointer;
+}
+
+#cameraModeButton p{
+    transform: translateY(12px);
+}
+
+#cameraMode{
+    position: relative;
+    display: none;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+#capture{
+    position: absolute;
+    left: 50%;
+    bottom: 50px;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 40px;
+    z-index: 3;
+}
+
+video {
+    width: auto;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+canvas {
+    z-index: 2;
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#cameraMode img{
+    display: none;
 }

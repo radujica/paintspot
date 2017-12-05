@@ -1,4 +1,104 @@
 // ----------
+//  Camera
+// ----------
+var width = 320;    // We will scale the photo width to this
+var height = 0;     // This will be computed based on the input stream
+
+var streaming = false;
+
+var video = null;
+var canvas = null;
+var photo = null;
+var capture = null;
+
+function startup() {
+
+    video = document.getElementById('video');
+    canvas = document.getElementById('canvas');
+    photo = document.getElementById('photo');
+    capture = document.getElementById('capture');
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(function(err) {
+            console.log("An error occured! " + err);
+        });
+
+    video.addEventListener('canplay', function(ev){
+          if (!streaming) {
+            height = video.videoHeight / (video.videoWidth/width);
+          
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+          }
+        }, false);
+
+    capture.addEventListener('click', function(ev){
+          takepicture();
+          ev.preventDefault();
+        }, false);
+
+    clearphoto();
+}
+
+function clearphoto() {
+    var context = canvas.getContext('2d');
+    context.fillStyle = "#AAA";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    var data = canvas.toDataURL('image/png');
+    $('#canvas').css({'display': 'none'});
+    photo.setAttribute('src', data);
+  }
+
+var photoTaken = false;
+function takepicture() {
+    var context = canvas.getContext('2d');
+    if (width && height && !photoTaken) {
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(video, 0, 0, width, height);
+
+      $('#canvas').css({
+        'width': 'auto', 
+        'height': '100%',
+        'display': 'block'
+        });
+      $('#capture').prop('disabled', true);
+
+      var data = canvas.toDataURL('image/png');
+      photo.setAttribute('src', data);
+      // document.querySelector('#capture').href = data;
+      console.log("Photo URL: " + photo.src);
+      sendMessage(photo.src, 'detect_objects');
+
+      photoTaken = true;
+    } else {
+      clearphoto();
+      photoTaken = false;
+    }
+  }
+
+startup();
+
+var cameraMode = false;
+$('#cameraModeButton').click(function(ev){
+      if(!cameraMode){
+        $('#cameraMode').css({'display': 'block'});
+        cameraMode = true;
+      }else{
+        $('#cameraMode').css({'display': 'none'});
+        cameraMode = false;
+      }
+});
+
+// ----------
 //  Speech
 // ----------
 
@@ -71,12 +171,16 @@ updateStatus(current_status);
 // ----------------
 
 var previous_response = ""
-var sendMessage = function(message){
+var sendMessage = function(message, type){
     if (!message) return;
+    
     console.log(message);
-    updateUserMessage(message);
+    if (type == 'communication'){
+        updateUserMessage(message);
+    }
+    
     updateStatus("thinking");
-    var url = $SCRIPT_ROOT + "/_communication";
+    var url = $SCRIPT_ROOT + "/_" + type;
     $.getJSON(url, {
         text: message,
       }, function(data) {
@@ -100,7 +204,7 @@ $('input').keypress(function (e) {
             event.preventDefault();
             text_input = $(this).val();
             $(this).val("");
-            sendMessage(text_input);
+            sendMessage(text_input, 'communication');
       }
 });
 
@@ -120,7 +224,7 @@ recognition.onresult = function(event) {
             var final_transcript = event.results[i][0].transcript;
             final_transcript = capitalizeFirstLetter(final_transcript);
             updateUserMessage(final_transcript);
-            sendMessage(final_transcript);
+            sendMessage(final_transcript, "communication");
         } else {
             interim_transcript += event.results[i][0].transcript;
             interim_transcript = capitalizeFirstLetter(interim_transcript);
