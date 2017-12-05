@@ -22,8 +22,7 @@ class MuseumAssistant():
 
 
 assistant = MuseumAssistant()
-#object_detector = ObjectDetector()
-object_detector = None
+object_detector = ObjectDetector()
 
 # Generate the landing page
 @app.route("/")
@@ -45,8 +44,8 @@ def handle_photo_input():
     data = request.args.get('text', 0, type=str)
     img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))
     print ("Provided filepath: %s"  % data)
-    #objects = object_detector.detect_objects([img])
-    objects = []
+    objects = object_detector.detect_objects([img])
+    #objects = []
     if 'person' in objects:
         response = "Person found."
     else:

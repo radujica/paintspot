@@ -15,21 +15,24 @@ from matplotlib import pyplot as plt
 import matplotlib.patches as patches
 from PIL import Image
 
+from watson_developer_cloud import VisualRecognitionV3
+
 if tf.__version__ != '1.4.0':
   raise ImportError('Please upgrade your tensorflow installation to v1.4.0!')
 
 class ObjectDetector():
     def __init__(self):
         self.model_name = 'faster_rcnn_resnet101_coco_2017_11_08'
+        self.model_name = 'ssd_mobilenet_v1_coco_2017_11_17'
         self.download_base = 'http://download.tensorflow.org/models/object_detection/'
 
         print ("Setting up object detector.")
         print ("+ Downloads model...")
-        #self.download_model()
+        self.download_model()
         print ("+ Loads model...")
-        #self.load_model()
+        self.load_model()
         print ("+ Initializes Watson Visual Recognition...")
-        #self.setup_watson()
+        self.setup_watson()
         print ("Done.")
 
 
@@ -65,7 +68,6 @@ class ObjectDetector():
         """Helper function which transforms the PIL Image into a numpy array"""
         im_width, im_height = img.size
         img_data = img.getdata()
-        print (np.array(img_data).shape)
         return np.array(img.getdata())[:, :3].reshape(
             (im_height, im_width, 3)).astype(np.uint8)
 

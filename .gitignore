@@ -108,5 +108,5 @@ ENV/
 
 
 # PAINTSPOT
-pretrained_model
+pretrained_model/faster*
 tmp.jpg

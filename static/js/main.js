@@ -57,10 +57,9 @@ function clearphoto() {
     photo.setAttribute('src', data);
   }
 
-var photoTaken = false;
 function takepicture() {
     var context = canvas.getContext('2d');
-    if (width && height && !photoTaken) {
+    if (width && height) {
       canvas.width = width;
       canvas.height = height;
       context.drawImage(video, 0, 0, width, height);
@@ -70,18 +69,14 @@ function takepicture() {
         'height': '100%',
         'display': 'block'
         });
-      $('#capture').prop('disabled', true);
+
+      $('#capture').css({'display': 'none'});
 
       var data = canvas.toDataURL('image/png');
       photo.setAttribute('src', data);
       // document.querySelector('#capture').href = data;
       console.log("Photo URL: " + photo.src);
       sendMessage(photo.src, 'detect_objects');
-
-      photoTaken = true;
-    } else {
-      clearphoto();
-      photoTaken = false;
     }
   }
 
@@ -192,6 +187,8 @@ var sendMessage = function(message, type){
         if(data.assistant_message != previous_response){
             updateAIMessage(data.assistant_message);
             speak(data.assistant_message);
+            $('#canvas').css({'display': 'none'});
+            $('#capture').css({'display': 'block'});
         }else{
             updateStatus("inactive");
         }
