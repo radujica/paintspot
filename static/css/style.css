@@ -287,6 +287,13 @@ canvas {
     transform: translate(-50%, -50%);
 }
 
-#cameraMode img{
+#img{
     display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 100%;
+    width: auto;
+    z-index: 10;
 }

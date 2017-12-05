@@ -60,8 +60,8 @@ class ObjectDetector():
                 tf.import_graph_def(od_graph_def, name='')
 
     def setup_watson(self):
-        WATSON_API_KEY = '05572b8833ce3e4086391ffa8c55b50381ec6d15'
         # Replace with your api key
+        WATSON_API_KEY = '05572b8833ce3e4086391ffa8c55b50381ec6d15'
         self.visual_recognition = VisualRecognitionV3('2017-11-30', api_key=WATSON_API_KEY)
 
     def load_image_into_numpy_array(self, img):
@@ -133,7 +133,13 @@ class ObjectDetector():
                         with open('tmp.png', 'rb') as image_file:
                             watson_params = json.dumps({'threshold': 0.5, 'classifier_ids': ['default']})
                             results = self.visual_recognition.classify(images_file=image_file, parameters=watson_params)
-                            label = results['images'][0]['classifiers'][0]['classes'][0]['class']
+
+                            object_suggestions = sorted(results['images'][0]['classifiers'][0]['classes'], key=lambda x: x['score'])[::-1]
+                            print ("Object suggestions")
+                            for o in object_suggestions:
+                                print ("   %s: %s" % (o['class'], o['score']))
+
+                            label = object_suggestions[0]['class']
                             ax = plt.gca()
                             ax.text(bx1 + 5, 
                                     by1 - 5, 
@@ -142,7 +148,7 @@ class ObjectDetector():
                                     color='white', 
                                     bbox={'facecolor': 'g', 'edgecolor':'none'})
 
-                            objects.extend([d['class'] for d in results['images'][0]['classifiers'][0]['classes']])
+                            objects.extend([o['class'] for o in object_suggestions])
 
                         # Create a Rectangle patch
                         rect = patches.Rectangle((bx1, by1), 
@@ -156,8 +162,8 @@ class ObjectDetector():
                         
                     fig.axes.get_xaxis().set_visible(False)
                     fig.axes.get_yaxis().set_visible(False)
-                    print ("Writing image to 'images/output.png'")
-                    plt.savefig('images/output.png', bbox_inches='tight', pad_inches=0.0)
+                    print ("Writing image to 'static/images/output.png'")
+                    plt.savefig('static/images/output.png', bbox_inches='tight', pad_inches=0.0)
                     # plt.show()
                     plt.close()
                     print ()

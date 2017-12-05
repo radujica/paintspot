@@ -15,7 +15,7 @@ function startup() {
 
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
-    photo = document.getElementById('photo');
+    photo = document.getElementById('img');
     capture = document.getElementById('capture');
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -159,6 +159,11 @@ var updateStatus = function(status){
     console.log("Status: " + status);
 }
 
+$('#img').click(function(){
+    $(this).css({'display': 'none'});
+    $('#video').css({'display': 'block'});
+});
+
 updateStatus(current_status);
 
 // ----------------
@@ -184,13 +189,15 @@ var sendMessage = function(message, type){
             updateStatus("inactive");
             return;
         }
-        if(data.assistant_message != previous_response){
-            updateAIMessage(data.assistant_message);
-            speak(data.assistant_message);
+        updateAIMessage(data.assistant_message);
+        speak(data.assistant_message);
+        if(type == 'detect_objects'){
+            $('#video').css({'display': 'none'});
             $('#canvas').css({'display': 'none'});
             $('#capture').css({'display': 'block'});
-        }else{
-            updateStatus("inactive");
+            var d = new Date();
+            photo.setAttribute('src', $SCRIPT_ROOT + 'static/images/output.png?' + d.getTime());
+            $('#img').css({'display': 'block'});
         }
         previous_response = data.assistant_message;
       });

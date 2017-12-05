@@ -3,7 +3,6 @@ from scipy.misc import imread, imresize
 import io, base64
 from PIL import Image
 import logging
-
 from object_detector import ObjectDetector
 
 app = Flask(__name__)
