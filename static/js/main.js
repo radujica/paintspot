@@ -208,7 +208,8 @@ $('input').keypress(function (e) {
             event.preventDefault();
             text_input = $(this).val();
             $(this).val("");
-            sendMessage(text_input, 'communication');
+            //sendMessage(text_input, 'communication');
+            sendMessage(text_input, "conversation");
       }
 });
 
@@ -229,6 +230,7 @@ recognition.onresult = function(event) {
             final_transcript = capitalizeFirstLetter(final_transcript);
             updateUserMessage(final_transcript);
             sendMessage(final_transcript, "communication");
+            sendMessage(text_input, "conversation");
         } else {
             interim_transcript += event.results[i][0].transcript;
             interim_transcript = capitalizeFirstLetter(interim_transcript);
@@ -247,6 +249,10 @@ var record = function() {
     }
 }
 
+/*$("#testConversation").click(function(){
+    console.log('clicked test');
+    sendMessage('painting1', 'conversation_handler');
+});*/
 
 // -------------
 // Other

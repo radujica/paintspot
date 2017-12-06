@@ -4,6 +4,7 @@ import io, base64
 from PIL import Image
 import logging
 from object_detector import ObjectDetector
+from conversation_handler import ConversationHandler
 
 app = Flask(__name__)
 
@@ -22,6 +23,7 @@ class MuseumAssistant():
 
 assistant = MuseumAssistant()
 object_detector = ObjectDetector()
+conversation_handler = ConversationHandler()
 
 # Generate the landing page
 @app.route("/")
@@ -51,6 +53,15 @@ def handle_photo_input():
         response = "No person found in the image."
     print ("Assistant response: %s" % response)
     return jsonify(assistant_message=response)
+
+
+@app.route('/_conversation', methods=['GET'])
+def handle_conversation():
+    text = request.args.get('text', 0, type=str)
+    response = conversation_handler.get_question(text)
+    print(response)
+    return jsonify(assistant_message=response)
+
 
 if __name__ == "__main__":
     # Set host address so that the server is accessible network wide
