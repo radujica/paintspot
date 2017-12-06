@@ -16,6 +16,7 @@ tensorflow = "*"
 pillow = "*"
 jupyter = "*"
 watson-developer-cloud = "*"
+scipy = "*"
 
 
 [dev-packages]
