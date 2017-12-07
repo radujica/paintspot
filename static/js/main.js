@@ -229,7 +229,7 @@ recognition.onresult = function(event) {
             var final_transcript = event.results[i][0].transcript;
             final_transcript = capitalizeFirstLetter(final_transcript);
             updateUserMessage(final_transcript);
-            sendMessage(final_transcript, "communication");
+            //sendMessage(final_transcript, "communication");
             sendMessage(text_input, "conversation");
         } else {
             interim_transcript += event.results[i][0].transcript;
@@ -253,6 +253,37 @@ var record = function() {
     console.log('clicked test');
     sendMessage('painting1', 'conversation_handler');
 });*/
+
+
+// -------------
+// Recreate conversation
+// -------------
+
+// timeout seems to be in total time from start
+function sendMessageToWatson(textToSend, waitingTime, textToShow) {
+    if (textToShow == null) {
+        textToShow = textToSend;
+    }
+
+    setTimeout(function() {
+        updateUserMessage(textToShow);
+        sendMessage(textToSend, "conversation");
+    }, waitingTime);
+}
+
+$(document).ready(function() {
+    sendMessageToWatson("aS", 3000, " - ");
+    sendMessageToWatson("Tom", 7000);
+    sendMessageToWatson("Yes", 16000);
+    // can't think of a quick way to remove the aTU-like keywords
+    // without hardcoding the exact questions in Conversation
+    sendMessageToWatson("aTU p1 q1", 23000, " - ");
+    sendMessageToWatson("17th?", 28000);
+    sendMessageToWatson("aTU p1 q2", 34000, " - ");
+    sendMessageToWatson("monkey", 39000, "<image>");    // this is the image recognition
+    sendMessageToWatson("uQ p1 grapes", 46000, "Do the grapes signify anything?");
+    sendMessageToWatson("rA", 52000, " - ");            // this one's funny with the text-to-speech
+});
 
 // -------------
 // Other
