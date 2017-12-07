@@ -120,9 +120,9 @@ class ObjectDetector():
                         by1, bx1, by2, bx2 = box.astype(int)
                         
                         box_height, box_width = (by2-by1), (bx2-bx1)
-                        
+
                         # Filters out some boxes
-                        if score < 0.6:
+                        if score < 0.4:
                             continue
                         
                         # Save cropped image as temporary file
@@ -139,10 +139,11 @@ class ObjectDetector():
                             for o in object_suggestions:
                                 print ("   %s: %s" % (o['class'], o['score']))
 
-                            label = object_suggestions[0]['class']
+                            # label = object_suggestions[0]['class']
+                            label = "\n".join(["%s: %.2f%%" % (o['class'], 100*float(o['score'])) for o in object_suggestions[:3]])
                             ax = plt.gca()
                             ax.text(bx1 + 5, 
-                                    by1 - 5, 
+                                    by2 - 5, 
                                     label, 
                                     fontsize=10, 
                                     color='white', 

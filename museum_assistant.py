@@ -14,7 +14,11 @@ class MuseumAssistant():
     def __init__(self): pass
 
     def get_response(self, message):
-        return "I don't understand."
+        if "application" in message:
+            return "You can find more information about existing Mauritshuis applications in the link at the \
+            top of the application."
+        
+        return "I'm not hooked up to the Watson Conversation API yet."
 
     def detect_objects(self, img):
         return "This is an image"

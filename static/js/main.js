@@ -1,99 +1,4 @@
 // ----------
-//  Camera
-// ----------
-var width = 320;    // We will scale the photo width to this
-var height = 0;     // This will be computed based on the input stream
-
-var streaming = false;
-
-var video = null;
-var canvas = null;
-var photo = null;
-var capture = null;
-
-function startup() {
-
-    video = document.getElementById('video');
-    canvas = document.getElementById('canvas');
-    photo = document.getElementById('img');
-    capture = document.getElementById('capture');
-
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then(function(stream) {
-            video.srcObject = stream;
-            video.play();
-        })
-        .catch(function(err) {
-            console.log("An error occured! " + err);
-        });
-
-    video.addEventListener('canplay', function(ev){
-          if (!streaming) {
-            height = video.videoHeight / (video.videoWidth/width);
-          
-            video.setAttribute('width', width);
-            video.setAttribute('height', height);
-            canvas.setAttribute('width', width);
-            canvas.setAttribute('height', height);
-            streaming = true;
-          }
-        }, false);
-
-    capture.addEventListener('click', function(ev){
-          takepicture();
-          ev.preventDefault();
-        }, false);
-
-    clearphoto();
-}
-
-function clearphoto() {
-    var context = canvas.getContext('2d');
-    context.fillStyle = "#AAA";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-
-    var data = canvas.toDataURL('image/png');
-    $('#canvas').css({'display': 'none'});
-    photo.setAttribute('src', data);
-  }
-
-function takepicture() {
-    var context = canvas.getContext('2d');
-    if (width && height) {
-      canvas.width = width;
-      canvas.height = height;
-      context.drawImage(video, 0, 0, width, height);
-
-      $('#canvas').css({
-        'width': 'auto', 
-        'height': '100%',
-        'display': 'block'
-        });
-
-      $('#capture').css({'display': 'none'});
-
-      var data = canvas.toDataURL('image/png');
-      photo.setAttribute('src', data);
-      // document.querySelector('#capture').href = data;
-      console.log("Photo URL: " + photo.src);
-      sendMessage(photo.src, 'detect_objects');
-    }
-  }
-
-startup();
-
-var cameraMode = false;
-$('#cameraModeButton').click(function(ev){
-      if(!cameraMode){
-        $('#cameraMode').css({'display': 'block'});
-        cameraMode = true;
-      }else{
-        $('#cameraMode').css({'display': 'none'});
-        cameraMode = false;
-      }
-});
-
-// ----------
 //  Speech
 // ----------
 
@@ -103,15 +8,26 @@ function voiceStartCallback() {
  
 function voiceEndCallback() {
     updateStatus("inactive");
+
+    // If the read message was information about existing applications
+    // toggle animation of link to website with information about applications
+    if (prev_message.includes('application')){
+        $('#mh_link').bind("animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd", function(){
+            $(this).removeClass("pop_animation");
+        }).addClass("pop_animation");
+    }
+
 }
 
 var speech_parameters = {
     onend: voiceEndCallback
 }
 
+var prev_message = "";
 var speak = function(new_message){
     voiceStartCallback();
     responsiveVoice.speak(new_message, "UK English Male", speech_parameters);
+    prev_message = new_message;
 }
 
 // ----------
@@ -128,18 +44,26 @@ var updateAIMessage = function(new_message){
     $("#assistant_message").text(new_message);
 }
 
+// Images
+var camera_img = $SCRIPT_ROOT + "/static/images/camera.png";
+$("#cameraModeButton img").attr("src", camera_img);
+
+var mh_img = $SCRIPT_ROOT + "/static/images/mauritshuis_logo.png";
+$("#mh_link img").attr("src", mh_img);
+
+
+
 // States
 var inactive = $SCRIPT_ROOT + "/static/images/microphone.png";
 var listening = $SCRIPT_ROOT + "/static/images/microphone-1.png";
 var thinking = $SCRIPT_ROOT + "/static/images/settings.png";
 var talking = $SCRIPT_ROOT + "/static/images/speakers.png";
-var glasses = $SCRIPT_ROOT + "/static/images/eyeglasses.png";
 
 var current_status = "inactive";
 var updateStatus = function(status){
     $("#inactiveStatus img").attr("src", inactive);
     $('#activeStatus').css({'animation': 'none'});
-    $("#activeStatus").attr("src", glasses);
+    $("#activeStatus").attr("src", inactive);
 
     if(status == "talking"){
         $("#activeStatus").attr("src", talking);
@@ -246,6 +170,102 @@ var record = function() {
         recognition.start();
     }
 }
+
+
+// ----------
+//  Camera
+// ----------
+var width = 320;    // We will scale the photo width to this
+var height = 0;     // This will be computed based on the input stream
+
+var streaming = false;
+
+var video = null;
+var canvas = null;
+var photo = null;
+var capture = null;
+
+function startup() {
+
+    video = document.getElementById('video');
+    canvas = document.getElementById('canvas');
+    photo = document.getElementById('img');
+    capture = document.getElementById('capture');
+
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+        })
+        .catch(function(err) {
+            console.log("An error occured! " + err);
+        });
+
+    video.addEventListener('canplay', function(ev){
+          if (!streaming) {
+            height = video.videoHeight / (video.videoWidth/width);
+          
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+          }
+        }, false);
+
+    capture.addEventListener('click', function(ev){
+          takepicture();
+          ev.preventDefault();
+        }, false);
+
+    clearphoto();
+}
+
+function clearphoto() {
+    var context = canvas.getContext('2d');
+    context.fillStyle = "#AAA";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    var data = canvas.toDataURL('image/png');
+    $('#canvas').css({'display': 'none'});
+    photo.setAttribute('src', data);
+  }
+
+function takepicture() {
+    var context = canvas.getContext('2d');
+    if (width && height) {
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(video, 0, 0, width, height);
+
+      $('#canvas').css({
+        'width': 'auto', 
+        'height': '100%',
+        'display': 'block'
+        });
+
+      $('#capture').css({'display': 'none'});
+
+      var data = canvas.toDataURL('image/png');
+      photo.setAttribute('src', data);
+      // document.querySelector('#capture').href = data;
+      console.log("Photo URL: " + photo.src);
+      sendMessage(photo.src, 'detect_objects');
+    }
+  }
+
+startup();
+
+var cameraMode = false;
+$('#cameraModeButton').click(function(ev){
+      if(!cameraMode){
+        $('#cameraMode').css({'display': 'block'});
+        cameraMode = true;
+      }else{
+        $('#cameraMode').css({'display': 'none'});
+        cameraMode = false;
+      }
+});
 
 
 // -------------

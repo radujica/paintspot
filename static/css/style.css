@@ -30,6 +30,16 @@ input:focus {outline:0;}
     color: white;
 }
 
+.button{
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border-radius: 50%;
+    border: 2px solid black;
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 20;
+}
 
 
 #messages{
@@ -103,23 +113,6 @@ input:focus {outline:0;}
     position: absolute;
     bottom: 30px;
     left: 20px;
-    background-color: white;
-    border: 2px solid black;
-    border-radius: 50%;
-    width: 70px;
-    height: 70px;
-    overflow: hidden;
-}
-
-#cameraButton {
-    position: absolute;
-    bottom: 130px;
-    left: 20px;
-    background-color: white;
-    border: 2px solid black;
-    border-radius: 50%;
-    width: 70px;
-    height: 70px;
     overflow: hidden;
 }
 
@@ -213,17 +206,21 @@ input[type="text"]
     }
 
     #recordButton{
-        top: 20px;
+        top: 30px;
         right: 20px;
-        width: 50px;
-        height: 50px;
         left: auto;
         bottom: auto;
-        border: none;
+        /*border: none;*/
     }
 
-    #inactiveStatus{
-        display: none !important;
+    #mh_link{
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%) scale(1) !important;
+    }
+
+    .pop_animation {
+        animation: animationMobile 600ms linear both !important;
     }
 
     #icon{
@@ -235,16 +232,16 @@ input[type="text"]
     position: absolute;
     top: 30px;
     left: 20px;
-    width: 80px;
-    height: 80px;
     z-index: 10;
-    border-radius: 50%;
-    border: 2px solid black;
-    cursor: pointer;
 }
 
-#cameraModeButton p{
-    transform: translateY(14px);
+#cameraModeButton img{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    transform: translate(-50%, -50%);
 }
 
 #cameraMode{
@@ -260,13 +257,14 @@ input[type="text"]
     left: 50%;
     bottom: 30px;
     transform: translateX(-50%);
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     z-index: 3;
     border-radius: 50%;
     border: 2px solid;
     font-family: "Raleway";
     font-size: 16;
+    background-color: white;
 }
 
 video {
@@ -295,5 +293,50 @@ canvas {
     transform: translate(-50%, -50%);
     height: 100%;
     width: auto;
-    z-index: 10;
 }
+
+#mh_link{
+    position: absolute;
+    right: 20px;
+    top: 30px;
+    transform: scale(1);
+}
+
+#mh_link img{
+    width: 50px;
+    height: 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#mh_link > p{
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #AA9560;
+    font-size: 12;
+}
+
+#mh_link > p:first-child{
+    top: -2px;
+}
+
+#mh_link > p:last-child{
+    bottom: -2px;
+}
+
+
+/*MAURITSHUIS LINK ANIMATION*/
+.pop_animation {
+    animation: animation 600ms linear both;
+}
+
+@-webkit-keyframes animation { 
+  0% { transform: scale(1);}
+  40% { transform: scale(0.8);}
+  60% { transform: scale(1.2);} 
+  100% { transform: scale(1);} 
+}
+

@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Raleway -->
     <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,500' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 
@@ -16,11 +17,11 @@
 
     <form autocomplete="off"><input placeholder="Write to the Museum Docent" autocomplete="false" type="text" x-webkit-speech></form>
     
-<!--     <div id="cameraButton">
-        <input type="file" accept="image/*;capture=camera">
-    </div> -->
-
-    <!-- <a id="dl-btn" href="#" download="glorious_selfie.png">Save Photo</a> -->
+    <a id="mh_link" target="_blank" href="https://www.mauritshuis.nl/en/visit/plan-your-visit/mauritshuis-tour/" class="button">
+        <p>Existing</p>
+        <img src="">
+        <p>Apps</p>
+    </a>
 
     <div id="cameraMode">
         <button id="capture">Capture</button>
@@ -30,11 +31,12 @@
         <img id="img" alt="The img with object boxes will appear here.">
     </div>
 
+    <a id="cameraModeButton" class="button">
+        <!-- <p style='text-align: center'>Camera</p> -->
+        <img src="">
+    </a>
 
-
-    <a id="cameraModeButton"><p style='text-align: center'>Camera</p></a>
-
-    <div id="recordButton">
+    <div id="recordButton" class="button">
         <button id="inactiveStatus" class="status" onclick="record()"><img src=""></button>
         <img id="activeStatus" class="status" src=""></img>
     </div>
@@ -46,6 +48,7 @@
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
     <!-- <script src="{{ url_for('static', filename='js/lodash.core.js') }}"></script> -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bounce.min.js') }}"></script>
 
 </body>
 </html>
