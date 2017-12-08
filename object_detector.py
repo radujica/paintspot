@@ -22,7 +22,7 @@ if tf.__version__ != '1.4.0':
 
 class ObjectDetector():
     def __init__(self):
-        self.model_name = 'faster_rcnn_resnet101_coco_2017_11_08'
+        # self.model_name = 'faster_rcnn_resnet101_coco_2017_11_08'
         self.model_name = 'ssd_mobilenet_v1_coco_2017_11_17'
         self.download_base = 'http://download.tensorflow.org/models/object_detection/'
 
@@ -71,7 +71,7 @@ class ObjectDetector():
         return np.array(img.getdata())[:, :3].reshape(
             (im_height, im_width, 3)).astype(np.uint8)
 
-    def detect_objects(self, images):
+    def detect_objects(self, image, label):
         img_height, img_width = None, None
         print ("Object detection.")
         with self.detection_graph.as_default():
@@ -83,91 +83,107 @@ class ObjectDetector():
                 detection_scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
                 detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
                 num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
+           
+                print ("OBJECT DETECTION")
+                # Numpy representation of image
+                image_np = self.load_image_into_numpy_array(image)
+                img_height, img_width, _ = image_np.shape
+                
+                # Create figure and axes and display the image
+                fig = plt.figure(figsize=(24, 16), frameon=False)
+                fig = plt.imshow(image_np)
+                
+                # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+                image_np_expanded = np.expand_dims(image_np, axis=0)
+                
+                # Do object detection.
+                print ("+ Detecting objects")
+                (boxes, scores, classes, num) = sess.run(
+                    [detection_boxes, detection_scores, detection_classes, num_detections],
+                    feed_dict={image_tensor: image_np_expanded})
+                
+                boxes = np.squeeze(boxes)
+                classes = np.squeeze(classes).astype(np.int32)
+                scores = np.squeeze(scores)
 
-                for i, image in enumerate(images):
-                    print ("(%d) Opening image" % i)
-                                        
-                    # Numpy representation of image
-                    image_np = self.load_image_into_numpy_array(image)
-                    img_height, img_width, _ = image_np.shape
+                # From normalized coordinates to pixel coordinates
+                boxes[:, [0, 2]] *= img_height
+                boxes[:, [1, 3]] *= img_width
+
+                # Sort by score in descending order
+                # idx = np.argsort(scores)[::-1]
+                # boxes = boxes[idx]
+                # classes = classes[idx]
+                # scores = scores[idx]
+                
+                print ("+ Classifying objects")
+                objects = []
+
+                # Draw box with highest score
+                highest = {'score': 0, 'coordinates': []}
+
+                for box, score, _ in zip(boxes, scores, classes):
                     
-                    # Create figure and axes and display the image
-                    fig = plt.figure(figsize=(24, 16), frameon=False)
-                    fig = plt.imshow(image_np)
+                    # Get box coordinates (of upper left and lower right corners)
+                    by1, bx1, by2, bx2 = box.astype(int)
+
+                    # Filters out some boxes
+                    if score < 0.3:
+                        continue
                     
-                    # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-                    image_np_expanded = np.expand_dims(image_np, axis=0)
+                    # Save cropped image as temporary file
+                    obj = image.crop((bx1, by1, bx2, by2))
+                    obj.save('tmp.png')
                     
-                    # Do object detection.
-                    print ("+ Detecting objects")
-                    (boxes, scores, classes, num) = sess.run(
-                        [detection_boxes, detection_scores, detection_classes, num_detections],
-                        feed_dict={image_tensor: image_np_expanded})
-                    
-                    boxes = np.squeeze(boxes)
-                    classes = np.squeeze(classes).astype(np.int32)
-                    scores = np.squeeze(scores)
+                    contains_label = False
+                    # Open cropped image and classify using Watson
+                    with open('tmp.png', 'rb') as image_file:
+                        watson_params = json.dumps({'threshold': 0.5, 'classifier_ids': ['default']})
+                        results = self.visual_recognition.classify(images_file=image_file, parameters=watson_params)
 
-                    # From normalized coordinates to pixel coordinates
-                    boxes[:, [0, 2]] *= img_height
-                    boxes[:, [1, 3]] *= img_width
-                    
-                    print ("+ Classifying objects")
-                    objects = []
-                    for box, score, label in zip(boxes, scores, classes):
+                        object_suggestions = sorted(results['images'][0]['classifiers'][0]['classes'], reverse=True, key=lambda x: x['score'])
                         
-                        # Get box coordinates (of upper left and lower right corners)
-                        by1, bx1, by2, bx2 = box.astype(int)
-                        
-                        box_height, box_width = (by2-by1), (bx2-bx1)
+                        print ("Object suggestions")
+                        for o in object_suggestions:
+                            print ("   %s: %s" % (o['class'], o['score']))
+                            if o['class'] == label:
+                                if o['score'] > highest['score']:
+                                    highest = {'score': o['score'], 'coordinates': [by1, bx1, by2, bx2]}
+                                break
 
-                        # Filters out some boxes
-                        if score < 0.4:
-                            continue
-                        
-                        # Save cropped image as temporary file
-                        obj = image.crop((bx1, by1, bx2, by2))
-                        obj.save('tmp.png')
-                        
-                        # Open cropped image and classify using Watson
-                        with open('tmp.png', 'rb') as image_file:
-                            watson_params = json.dumps({'threshold': 0.5, 'classifier_ids': ['default']})
-                            results = self.visual_recognition.classify(images_file=image_file, parameters=watson_params)
+                        # All objects returned as suggestions for object by Watson Visual Recognition
+                        objects.extend([o['class'] for o in object_suggestions])
 
-                            object_suggestions = sorted(results['images'][0]['classifiers'][0]['classes'], key=lambda x: x['score'])[::-1]
-                            print ("Object suggestions")
-                            for o in object_suggestions:
-                                print ("   %s: %s" % (o['class'], o['score']))
+                # If the label we're looking for is in one of the suggested labels by the 
+                # Watson Visual Recognition service then we draw the label and bounding box
+                if label in objects:
+                    by1, bx1, by2, bx2 = highest['coordinates']
+                    box_height, box_width = (by2-by1), (bx2-bx1)
+                    ax = plt.gca()
+                    ax.text(bx1 + 5, 
+                            by2 - 6, 
+                            label, 
+                            fontsize=12, 
+                            color='black', 
+                            bbox={'facecolor': 'w', 'edgecolor':'none'})
 
-                            # label = object_suggestions[0]['class']
-                            label = "\n".join(["%s: %.2f%%" % (o['class'], 100*float(o['score'])) for o in object_suggestions[:3]])
-                            ax = plt.gca()
-                            ax.text(bx1 + 5, 
-                                    by2 - 5, 
-                                    label, 
-                                    fontsize=10, 
-                                    color='white', 
-                                    bbox={'facecolor': 'g', 'edgecolor':'none'})
+                    # Create a Rectangle patch
+                    rect = patches.Rectangle((bx1, by1), 
+                                             box_width, 
+                                             box_height, 
+                                             linewidth=3, 
+                                             edgecolor='w', 
+                                             facecolor='none')
+                    ax = plt.gca()
+                    ax.add_patch(rect)
 
-                            objects.extend([o['class'] for o in object_suggestions])
+                fig.axes.get_xaxis().set_visible(False)
+                fig.axes.get_yaxis().set_visible(False)
+                print ("Writing image to 'static/images/output.png'")
+                plt.savefig('static/images/output.png', bbox_inches='tight', pad_inches=0.0)
+                # plt.show()
+                plt.close()
+                print ()
 
-                        # Create a Rectangle patch
-                        rect = patches.Rectangle((bx1, by1), 
-                                                 box_width, 
-                                                 box_height, 
-                                                 linewidth=2, 
-                                                 edgecolor='g', 
-                                                 facecolor='none')
-                        ax = plt.gca()
-                        ax.add_patch(rect)
-                        
-                    fig.axes.get_xaxis().set_visible(False)
-                    fig.axes.get_yaxis().set_visible(False)
-                    print ("Writing image to 'static/images/output.png'")
-                    plt.savefig('static/images/output.png', bbox_inches='tight', pad_inches=0.0)
-                    # plt.show()
-                    plt.close()
-                    print ()
-
-                    return objects
+                return objects
 

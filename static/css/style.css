@@ -235,7 +235,76 @@ input[type="text"]
     z-index: 10;
 }
 
-#cameraModeButton img{
+#cameraModeButtonDemo {
+    position: absolute;
+    top: 130px;
+    left: 20px;
+    z-index: 10;
+}
+
+#cameraModeButtonDemo img{
+    top: 45%;
+}
+
+#cameraModeButtonDemo p{
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14;
+}
+
+#cameraDemo{
+    position: relative;
+    display: none;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+#demoCanvas{
+    display: none;
+    z-index: 2;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 300px;
+    width: 300px;
+}
+
+#demoImg{
+    transform: translate3d(0,0,0);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    transition: all 1s ease;
+}
+
+#monkeyImg{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 10;
+    width: 100%;
+    height: auto;
+    transition: opacity 0.4s ease;
+}
+
+/*#demoImg{
+    position: absolute;
+    left: -300px;
+    bottom: 0;
+    width: 400%;
+    height: auto;
+    transition: all 1s ease;
+}*/
+
+.cameraButton img{
     position: absolute;
     left: 50%;
     top: 50%;
@@ -252,7 +321,7 @@ input[type="text"]
     z-index: 2;
 }
 
-#capture{
+.captureButton{
     position: absolute;
     left: 50%;
     bottom: 30px;
@@ -276,7 +345,7 @@ video {
     z-index: 1;
 }
 
-canvas {
+#canvas {
     z-index: 2;
     display: none;
     position: absolute;

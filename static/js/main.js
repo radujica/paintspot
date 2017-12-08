@@ -46,10 +46,17 @@ var updateAIMessage = function(new_message){
 
 // Images
 var camera_img = $SCRIPT_ROOT + "/static/images/camera.png";
-$("#cameraModeButton img").attr("src", camera_img);
+$(".cameraButton img").attr("src", camera_img);
+
 
 var mh_img = $SCRIPT_ROOT + "/static/images/mauritshuis_logo.png";
 $("#mh_link img").attr("src", mh_img);
+
+var adam_eve_img = $SCRIPT_ROOT + "/static/images/adam_eve.png";
+$("#demoImg").attr("src", adam_eve_img);
+
+var monkey_img = $SCRIPT_ROOT + "/static/images/monkey.jpg";
+$("#monkeyImg").attr("src", monkey_img);
 
 
 
@@ -84,8 +91,28 @@ var updateStatus = function(status){
 }
 
 $('#img').click(function(){
-    $(this).css({'display': 'none'});
-    $('#video').css({'display': 'block'});
+    // Reset to default
+    $('#cameraMode').css({'display': 'none'});
+    cameraMode = false;
+});
+
+$('#monkeyImg').click(function(){
+    // Reset to default
+    $('#demoImg').css({
+        'display': 'block',
+        'transform': 'translate3d(0,0,0)',
+        'position': 'absolute',
+        'bottom': '0',
+        'left': '0',
+        'width': '100%',
+        'height': 'auto',
+        'transition': 'all 1s ease',
+    });
+    $('#monkeyImg').css({'display': 'none'});
+    $('#cameraDemo').css({'display': 'none'});
+    $("#monkeyImg").attr("src", monkey_img);
+
+    cameraDemo = false;
 });
 
 updateStatus(current_status);
@@ -94,17 +121,47 @@ updateStatus(current_status);
 //  Communication
 // ----------------
 
+var sendObjectDetectionMessage = function(img_data, label){    
+    console.log(img_data);
+
+    updateStatus("thinking");
+    var url = $SCRIPT_ROOT + "/_detect_objects";
+    $.getJSON(url, {
+        img: img_data,
+        label: label
+      }, function(data) {
+        console.log("Response: " + data.assistant_message);
+        if(data.assistant_message == " - "){
+            updateStatus("inactive");
+            return;
+        }
+
+        // Update visuals to show the image with object detections
+        var d = new Date();
+        if(label == 'monkey'){
+            document.getElementById('monkeyImg').setAttribute('src', $SCRIPT_ROOT + 'static/images/output.png?' + d.getTime());
+        }else{
+            $('#img').css({'display': 'block'});
+            photo.setAttribute('src', $SCRIPT_ROOT + 'static/images/output.png?' + d.getTime());
+            $('#video').css({'display': 'none'});
+            $('#canvas').css({'display': 'none'});
+            $('.captureButton').css({'display': 'block'});
+        }
+        updateAIMessage(data.assistant_message);
+        speak(data.assistant_message);
+        
+      });
+}
+
 var previous_response = ""
-var sendMessage = function(message, type){
+var sendMessage = function(message){
     if (!message) return;
     
     console.log(message);
-    if (type == 'communication'){
-        updateUserMessage(message);
-    }
+    updateUserMessage(message);
     
     updateStatus("thinking");
-    var url = $SCRIPT_ROOT + "/_" + type;
+    var url = $SCRIPT_ROOT + "/_conversation";
     $.getJSON(url, {
         text: message,
       }, function(data) {
@@ -115,14 +172,6 @@ var sendMessage = function(message, type){
         }
         updateAIMessage(data.assistant_message);
         speak(data.assistant_message);
-        if(type == 'detect_objects'){
-            $('#video').css({'display': 'none'});
-            $('#canvas').css({'display': 'none'});
-            $('#capture').css({'display': 'block'});
-            var d = new Date();
-            photo.setAttribute('src', $SCRIPT_ROOT + 'static/images/output.png?' + d.getTime());
-            $('#img').css({'display': 'block'});
-        }
         previous_response = data.assistant_message;
       });
 }
@@ -132,7 +181,7 @@ $('input').keypress(function (e) {
             event.preventDefault();
             text_input = $(this).val();
             $(this).val("");
-            sendMessage(text_input, 'communication');
+            sendMessage(text_input);
       }
 });
 
@@ -152,7 +201,7 @@ recognition.onresult = function(event) {
             var final_transcript = event.results[i][0].transcript;
             final_transcript = capitalizeFirstLetter(final_transcript);
             updateUserMessage(final_transcript);
-            sendMessage(final_transcript, "communication");
+            sendMessage(final_transcript);
         } else {
             interim_transcript += event.results[i][0].transcript;
             interim_transcript = capitalizeFirstLetter(interim_transcript);
@@ -171,6 +220,41 @@ var record = function() {
     }
 }
 
+/*$("#testConversation").click(function(){
+    console.log('clicked test');
+    sendMessage('painting1', 'conversation_handler');
+});*/
+
+
+// -------------
+// Recreate conversation
+// -------------
+
+// timeout seems to be in total time from start
+function sendMessageToWatson(textToSend, waitingTime, textToShow) {
+    if (textToShow == null) {
+        textToShow = textToSend;
+    }
+
+    setTimeout(function() {
+        updateUserMessage(textToShow);
+        sendMessage(textToSend);
+    }, waitingTime);
+}
+
+// $(document).ready(function() {
+//     sendMessageToWatson("aS", 3000, " - ");
+//     sendMessageToWatson("Tom", 7000);
+//     sendMessageToWatson("Yes", 16000);
+//     // can't think of a quick way to remove the aTU-like keywords
+//     // without hardcoding the exact questions in Conversation
+//     sendMessageToWatson("aTU p1 q1", 23000, " - ");
+//     sendMessageToWatson("17th?", 28000);
+//     sendMessageToWatson("aTU p1 q2", 34000, " - ");
+//     sendMessageToWatson("monkey", 39000, "<image>");    // this is the image recognition
+//     sendMessageToWatson("uQ p1 grapes", 46000, "Do the grapes signify anything?");
+//     sendMessageToWatson("rA", 52000, " - ");            // this one's funny with the text-to-speech
+// });
 
 // ----------
 //  Camera
@@ -190,7 +274,7 @@ function startup() {
     video = document.getElementById('video');
     canvas = document.getElementById('canvas');
     photo = document.getElementById('img');
-    capture = document.getElementById('capture');
+    capture = document.getElementById('captureButtonReal');
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
         .then(function(stream) {
@@ -231,6 +315,7 @@ function clearphoto() {
     photo.setAttribute('src', data);
   }
 
+var label = 'person'
 function takepicture() {
     var context = canvas.getContext('2d');
     if (width && height) {
@@ -244,13 +329,13 @@ function takepicture() {
         'display': 'block'
         });
 
-      $('#capture').css({'display': 'none'});
+      $('.captureButton').css({'display': 'none'});
 
       var data = canvas.toDataURL('image/png');
       photo.setAttribute('src', data);
       // document.querySelector('#capture').href = data;
-      console.log("Photo URL: " + photo.src);
-      sendMessage(photo.src, 'detect_objects');
+      console.log("Photo data: " + photo.src);
+      sendObjectDetectionMessage(photo.src, label);
     }
   }
 
@@ -258,13 +343,45 @@ startup();
 
 var cameraMode = false;
 $('#cameraModeButton').click(function(ev){
-      if(!cameraMode){
+    $('#cameraMode').css({'display': 'none'});
+    $('#cameraModeDemo').css({'display': 'none'});
+
+    if(!cameraMode){
         $('#cameraMode').css({'display': 'block'});
         cameraMode = true;
-      }else{
-        $('#cameraMode').css({'display': 'none'});
+    }else{
         cameraMode = false;
-      }
+    }
+});
+
+// DEMO OF CAMERA FEATURE
+var cameraDemo = false;
+$('#cameraModeButtonDemo').click(function(ev){
+    $('#cameraMode').css({'display': 'none'});
+    $('#cameraModeDemo').css({'display': 'none'});
+
+    if(!cameraDemo){
+        $('#cameraDemo').css({'display': 'block'});
+        cameraDemo = true;
+
+        setTimeout(function() {
+            // Pan to lower left corner (monkey's position)
+            $('#demoImg').css({
+                'left': '-300px',
+                'bottom': '0',
+                'width': '400%',
+            });
+        }, 2000);
+
+        setTimeout(function() {
+            sendObjectDetectionMessage('static/images/monkey.jpg', 'monkey');
+            $('#demoImg').css({'display': 'none'});
+            $('#monkeyImg').css({'display': 'block'});
+        }, 3000);
+
+    }else{
+        cameraDemo = false;
+    }
 });
 
 

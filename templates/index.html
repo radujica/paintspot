@@ -24,17 +24,32 @@
     </a>
 
     <div id="cameraMode">
-        <button id="capture">Capture</button>
+        <button id="captureButtonReal" class="captureButton">Capture</button>
         <video id="video"></video>
 
         <canvas id="canvas"></canvas>
         <img id="img" alt="The img with object boxes will appear here.">
     </div>
 
-    <a id="cameraModeButton" class="button">
+    <a id="cameraModeButton" class="button cameraButton">
         <!-- <p style='text-align: center'>Camera</p> -->
         <img src="">
     </a>
+
+    <div id="cameraDemo">
+        <img id="demoImg" src="">
+        <canvas id="demoCanvas"></canvas>
+        <button id="captureButtonFake" class="captureButton">Capture</button>
+        <img id="monkeyImg" src="">
+    </div>
+
+    <a id="cameraModeButtonDemo" class="button cameraButton">
+        <!-- <p style='text-align: center'>Camera</p> -->
+        <img src="">
+        <p>Demo</p>
+    </a>
+
+    <!--<button id="testConversation">CLICK ME</button>-->
 
     <div id="recordButton" class="button">
         <button id="inactiveStatus" class="status" onclick="record()"><img src=""></button>

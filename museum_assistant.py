@@ -1,9 +1,11 @@
 from flask import Flask, render_template, jsonify, request, url_for
 from scipy.misc import imread, imresize
+import matplotlib.pyplot as plt
 import io, base64
 from PIL import Image
 import logging
 from object_detector import ObjectDetector
+from conversation_handler import ConversationHandler
 
 app = Flask(__name__)
 
@@ -26,6 +28,7 @@ class MuseumAssistant():
 
 assistant = MuseumAssistant()
 object_detector = ObjectDetector()
+conversation_handler = ConversationHandler()
 
 # Generate the landing page
 @app.route("/")
@@ -44,17 +47,32 @@ def handle_text_input():
 # Receives the path to image => detects objects in image
 @app.route('/_detect_objects', methods= ['GET'])
 def handle_photo_input():
-    data = request.args.get('text', 0, type=str)
-    img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))
-    print ("Provided filepath: %s"  % data)
-    objects = object_detector.detect_objects([img])
-    #objects = []
-    if 'person' in objects:
-        response = "Person found."
+    # Handle inputs
+    data = request.args.get('img', 0, type=str)
+    label = request.args.get('label', 0, type=str)
+    print ("Provided image data: %s"  % data)
+
+    # Convert to image
+    if '.png' in data or '.jpg' in data:
+        img = Image.open(data)
     else:
-        response = "No person found in the image."
+        img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))
+
+    objects = object_detector.detect_objects(img, label)
+    if label in objects:
+        response = "You found the %s!" % label
+    else:
+        response = "No %s found in the image." % label
     print ("Assistant response: %s" % response)
     return jsonify(assistant_message=response)
+
+
+@app.route('/_conversation', methods=['GET'])
+def handle_conversation():
+    text = request.args.get('text', 0, type=str)
+    response = conversation_handler.reply_to_app(reply=text)
+    return jsonify(assistant_message=response)
+
 
 if __name__ == "__main__":
     # Set host address so that the server is accessible network wide
