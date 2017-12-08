@@ -30,6 +30,10 @@ assistant = MuseumAssistant()
 object_detector = ObjectDetector()
 conversation_handler = ConversationHandler()
 
+facts = {
+    'monkey': 'The monkey is the hotspur who cannot resist temptation.'
+}
+
 # Generate the landing page
 @app.route("/")
 def index():
@@ -59,8 +63,12 @@ def handle_photo_input():
         img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))
 
     objects = object_detector.detect_objects(img, label)
-    if label in objects:
+    if label == 'monkey' and label in objects:
+        response = conversation_handler.reply_to_app(reply='monkey')
+    elif label in objects:
         response = "You found the %s!" % label
+        if label in facts:
+            response = "%s %s" % (response, facts[label])
     else:
         response = "No %s found in the image." % label
     print ("Assistant response: %s" % response)
