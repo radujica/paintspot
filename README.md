@@ -20,3 +20,11 @@ pipenv install
 pipenv shell
 <run Python scripts now>
 ```
+
+## Mobile View
+
+<p align="center">
+    <kbd>
+      <img src="https://github.com/radujica/paintspot/blob/master/images/mobile_view.jpg?raw=true" width="320"\>
+     </kbd>
+</p>
