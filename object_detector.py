@@ -158,6 +158,8 @@ class ObjectDetector():
                 # Watson Visual Recognition service then we draw the label and bounding box
                 if label in objects:
                     by1, bx1, by2, bx2 = highest['coordinates']
+
+                    print (highest['coordinates'])
                     box_height, box_width = (by2-by1), (bx2-bx1)
                     ax = plt.gca()
                     ax.text(bx1 + 5, 

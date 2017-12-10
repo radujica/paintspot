@@ -39,6 +39,8 @@ input:focus {outline:0;}
     cursor: pointer;
     overflow: hidden;
     z-index: 20;
+    position: absolute;
+    top: 60px;
 }
 
 
@@ -110,9 +112,7 @@ input:focus {outline:0;}
 }
 
 #recordButton {
-    position: absolute;
-    bottom: 30px;
-    left: 20px;
+    right: 20px;
     overflow: hidden;
 }
 
@@ -185,7 +185,7 @@ input[type="text"]
 @media screen and (max-width: 768px){
 
     form {
-        bottom: 5px;
+        bottom: 3px;
     }
 
     form input{
@@ -205,39 +205,20 @@ input[type="text"]
         line-height: 30px;
     }
 
-    #recordButton{
-        top: 30px;
-        right: 20px;
-        left: auto;
-        bottom: auto;
-        /*border: none;*/
-    }
-
-    #mh_link{
-        right: auto;
-        left: 50%;
-        transform: translateX(-50%) scale(1) !important;
-    }
-
-    .pop_animation {
-        animation: animationMobile 600ms linear both !important;
-    }
-
     #icon{
         display: none;
     }
 }
 
 #cameraModeButton {
-    position: absolute;
-    top: 30px;
     left: 20px;
     z-index: 10;
+    display: none;
 }
 
 #cameraModeButtonDemo {
-    position: absolute;
-    top: 130px;
+/*    position: absolute;
+    top: 170px;*/
     left: 20px;
     z-index: 10;
 }
@@ -273,15 +254,30 @@ input[type="text"]
     width: 300px;
 }
 
+/*Before zoom*/
 #demoImg{
     transform: translate3d(0,0,0);
+    transform: scale(1) translateY(-50%);
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
+    top: 50%;
+    left: -30%;
+    height: 100%;
+    width: auto;
     transition: all 1s ease;
 }
+
+/*After zoom*/
+/*#demoImg{
+    transform: translate3d(0,0,0);
+    transform: translateX(-50%);
+    position: absolute;
+    top: auto;
+    left: 2100px;
+    bottom: 0;
+    height: 650%;
+    width: auto;
+    transition: all 1s ease;
+}*/
 
 #monkeyImg{
     position: absolute;
@@ -290,8 +286,8 @@ input[type="text"]
     transform: translate(-50%, -50%);
     display: none;
     z-index: 10;
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100%;
     transition: opacity 0.4s ease;
 }
 
@@ -365,10 +361,8 @@ video {
 }
 
 #mh_link{
-    position: absolute;
-    right: 20px;
-    top: 30px;
-    transform: scale(1);
+    left: 50%;
+    transform: translateX(-50%) scale(1);
 }
 
 #mh_link img{
@@ -396,6 +390,20 @@ video {
     bottom: -2px;
 }
 
+#paintspot{
+    position: absolute;
+    left: 50%;
+    top: -8px;
+    transform: translateX(-50%);
+    font-size: 24;
+    font-family: "Raleway";
+    color: rgb(200,200,200);
+    letter-spacing: 3px;
+    z-index: 20;
+    width: 100%;
+    text-align: center;
+}
+
 
 /*MAURITSHUIS LINK ANIMATION*/
 .pop_animation {
@@ -403,9 +411,9 @@ video {
 }
 
 @-webkit-keyframes animation { 
-  0% { transform: scale(1);}
-  40% { transform: scale(0.8);}
-  60% { transform: scale(1.2);} 
-  100% { transform: scale(1);} 
+  0% { transform: translateX(-50%) scale(1);}
+  40% { transform: translateX(-50%) scale(0.8);}
+  60% { transform: translateX(-50%) scale(1.2);} 
+  100% { transform: translateX(-50%) scale(1);} 
 }
 

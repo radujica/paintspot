@@ -48,7 +48,6 @@ var updateAIMessage = function(new_message){
 var camera_img = $SCRIPT_ROOT + "/static/images/camera.png";
 $(".cameraButton img").attr("src", camera_img);
 
-
 var mh_img = $SCRIPT_ROOT + "/static/images/mauritshuis_logo.png";
 $("#mh_link img").attr("src", mh_img);
 
@@ -56,7 +55,10 @@ var adam_eve_img = $SCRIPT_ROOT + "/static/images/adam_eve.png";
 $("#demoImg").attr("src", adam_eve_img);
 
 var monkey_img = $SCRIPT_ROOT + "/static/images/monkey.jpg";
-$("#monkeyImg").attr("src", monkey_img);
+var monkey_img_mobile = $SCRIPT_ROOT + "/static/images/monkey_mobile.jpg";
+$("#monkeyImg").attr("src", monkey_img_mobile);
+
+
 
 
 
@@ -93,27 +95,29 @@ var updateStatus = function(status){
 $('#img').click(function(){
     // Reset to default
     $('#cameraMode').css({'display': 'none'});
+    $('#video').css({'display': 'block'});
+    $('#img').css({'display': 'none'});
     cameraMode = false;
 });
 
 $('#monkeyImg').click(function(){
+    resetCameraDemo();
+});
+
+var resetCameraDemo = function(){
+    $('#cameraDemo').css({'display': 'none'});
     // Reset to default
     $('#demoImg').css({
         'display': 'block',
-        'transform': 'translate3d(0,0,0)',
-        'position': 'absolute',
-        'bottom': '0',
-        'left': '0',
-        'width': '100%',
-        'height': 'auto',
-        'transition': 'all 1s ease',
+        'left': '-30%',
+        'transform': 'scale(1) translateY(-50%)',
     });
+    $('#paintspot').css({'color': 'rgb(200, 200, 200)'});
     $('#monkeyImg').css({'display': 'none'});
-    $('#cameraDemo').css({'display': 'none'});
-    $("#monkeyImg").attr("src", monkey_img);
-
+    // $("#monkeyImg").attr("src", monkey_img);
+    $("#monkeyImg").attr("src", monkey_img_mobile);
     cameraDemo = false;
-});
+}
 
 updateStatus(current_status);
 
@@ -139,7 +143,7 @@ var sendObjectDetectionMessage = function(img_data, label){
         // Update visuals to show the image with object detections
         var d = new Date();
         if(label == 'monkey'){
-            document.getElementById('monkeyImg').setAttribute('src', $SCRIPT_ROOT + 'static/images/output.png?' + d.getTime());
+            document.getElementById('monkeyImg').setAttribute('src', $SCRIPT_ROOT + 'static/images/monkey_output.png?' + d.getTime());
         }else{
             $('#img').css({'display': 'block'});
             photo.setAttribute('src', $SCRIPT_ROOT + 'static/images/output.png?' + d.getTime());
@@ -361,25 +365,27 @@ $('#cameraModeButtonDemo').click(function(ev){
     $('#cameraModeDemo').css({'display': 'none'});
 
     if(!cameraDemo){
-        $('#cameraDemo').css({'display': 'block'});
         cameraDemo = true;
+        $('#cameraDemo').css({'display': 'block'});
+
+        $('#paintspot').css({'color': 'white'});
 
         setTimeout(function() {
             // Pan to lower left corner (monkey's position)
             $('#demoImg').css({
-                'left': '-300px',
-                'bottom': '0',
-                'width': '400%',
+                'left': '320%',
+                'transform': 'scale(5) translateY(-50%)'
             });
-        }, 2000);
+        }, 1000);
 
         setTimeout(function() {
-            sendObjectDetectionMessage('static/images/monkey.jpg', 'monkey');
+            sendObjectDetectionMessage('static/images/monkey_mobile.jpg', 'monkey');
             $('#demoImg').css({'display': 'none'});
             $('#monkeyImg').css({'display': 'block'});
-        }, 3000);
+        }, 2000);
 
     }else{
+        resetCameraDemo();
         cameraDemo = false;
     }
 });

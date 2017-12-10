@@ -3,7 +3,7 @@ from scipy.misc import imread, imresize
 import matplotlib.pyplot as plt
 import io, base64
 from PIL import Image
-import logging
+import logging, time
 from object_detector import ObjectDetector
 from conversation_handler import ConversationHandler
 
@@ -30,10 +30,6 @@ assistant = MuseumAssistant()
 object_detector = ObjectDetector()
 conversation_handler = ConversationHandler()
 
-facts = {
-    'monkey': 'The monkey is the hotspur who cannot resist temptation.'
-}
-
 # Generate the landing page
 @app.route("/")
 def index():
@@ -58,19 +54,22 @@ def handle_photo_input():
 
     # Convert to image
     if '.png' in data or '.jpg' in data:
-        img = Image.open(data)
+        img = Image.open(data) # For demo
     else:
-        img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))
+        img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1]))) # For camera
 
-    objects = object_detector.detect_objects(img, label)
-    if label == 'monkey' and label in objects:
+    # 1: Demo case
+    if label == 'monkey':
+        time.sleep(2)
         response = conversation_handler.reply_to_app(reply='monkey')
-    elif label in objects:
-        response = "You found the %s!" % label
-        if label in facts:
-            response = "%s %s" % (response, facts[label])
     else:
-        response = "No %s found in the image." % label
+        objects = object_detector.detect_objects(img, label)
+        # 2: Object was found
+        if label in objects:
+            response = "You found the %s!" % label
+        # 3: Object was not found
+        else:
+            response = "No %s found in the image." % label
     print ("Assistant response: %s" % response)
     return jsonify(assistant_message=response)
 
