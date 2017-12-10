@@ -93,18 +93,22 @@ var updateStatus = function(status){
 }
 
 $('#img').click(function(){
+    resetCameraMode();
+});
+
+var resetCameraMode = function() {
     // Reset to default
     $('#cameraMode').css({'display': 'none'});
     $('#video').css({'display': 'block'});
     $('#img').css({'display': 'none'});
     cameraMode = false;
-});
+}
 
-$('#monkeyImg').click(function(){
+$('#monkeyImg').click(function() {
     resetCameraDemo();
 });
 
-var resetCameraDemo = function(){
+var resetCameraDemo = function() {
     $('#cameraDemo').css({'display': 'none'});
     // Reset to default
     $('#demoImg').css({
@@ -354,6 +358,7 @@ $('#cameraModeButton').click(function(ev){
         $('#cameraMode').css({'display': 'block'});
         cameraMode = true;
     }else{
+        resetCameraMode();
         cameraMode = false;
     }
 });

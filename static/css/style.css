@@ -225,6 +225,7 @@ input[type="text"]
 
 #cameraModeButtonDemo img{
     top: 45%;
+    top: 50%;
 }
 
 #cameraModeButtonDemo p{
@@ -233,6 +234,7 @@ input[type="text"]
     left: 50%;
     transform: translateX(-50%);
     font-size: 14;
+    display: none;
 }
 
 #cameraDemo{
@@ -393,7 +395,7 @@ video {
 #paintspot{
     position: absolute;
     left: 50%;
-    top: -8px;
+    top: -7px;
     transform: translateX(-50%);
     font-size: 24;
     font-family: "Raleway";
