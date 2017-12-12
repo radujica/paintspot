@@ -18,8 +18,9 @@ pipenv install
 
 ```
 pipenv shell
-<run Python scripts now>
+python3 museum_assistant.py
 ```
+Go to <b>localhost:5050</b> in your browser.
 
 ## Mobile View
 
