@@ -77,7 +77,10 @@ def handle_photo_input():
 @app.route('/_conversation', methods=['GET'])
 def handle_conversation():
     text = request.args.get('text', 0, type=str)
-    response = conversation_handler.reply_to_app(reply=text)
+    if "thanks" in text.lower():
+        response = "You're welcome!"
+    else:
+        response = conversation_handler.reply_to_app(reply=text)
     return jsonify(assistant_message=response)
 
 

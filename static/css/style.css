@@ -213,19 +213,16 @@ input[type="text"]
 #cameraModeButton {
     left: 20px;
     z-index: 10;
-    display: none;
 }
 
 #cameraModeButtonDemo {
-/*    position: absolute;
-    top: 170px;*/
+    top: 170px;
     left: 20px;
     z-index: 10;
 }
 
 #cameraModeButtonDemo img{
     top: 45%;
-    top: 50%;
 }
 
 #cameraModeButtonDemo p{
@@ -234,7 +231,6 @@ input[type="text"]
     left: 50%;
     transform: translateX(-50%);
     font-size: 14;
-    display: none;
 }
 
 #cameraDemo{
