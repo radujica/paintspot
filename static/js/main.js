@@ -228,11 +228,6 @@ var record = function() {
     }
 }
 
-/*$("#testConversation").click(function(){
-    console.log('clicked test');
-    sendMessage('painting1', 'conversation_handler');
-});*/
-
 
 // -------------
 // Recreate conversation
