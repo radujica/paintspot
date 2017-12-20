@@ -1,4 +1,5 @@
 from watson_developer_cloud import ConversationV1
+from watson_developer_cloud.conversation_v1 import InputData
 
 
 class ConversationHandler:
@@ -28,12 +29,10 @@ class ConversationHandler:
     str
         Text answer from Conversation.
     """
-    def reply_to_app(self, reply=''):
+    def reply_to_app(self, reply):
         response = self._conversation.message(
             workspace_id=self.WORKSPACE_ID,
-            input={
-                'text': reply
-            },
+            input=InputData(reply),
             context=self._context
         )
         self._context = response['context']

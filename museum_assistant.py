@@ -1,9 +1,9 @@
-from flask import Flask, render_template, jsonify, request, url_for
-from scipy.misc import imread, imresize
-import matplotlib.pyplot as plt
-import io, base64
+from flask import Flask, render_template, jsonify, request
+import io
+import base64
 from PIL import Image
-import logging, time
+import logging
+import time
 from object_detector import ObjectDetector
 from conversation_handler import ConversationHandler
 
@@ -12,7 +12,8 @@ app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-class MuseumAssistant():
+
+class MuseumAssistant(object):
     def __init__(self): pass
 
     def get_response(self, message):
@@ -30,33 +31,36 @@ assistant = MuseumAssistant()
 object_detector = ObjectDetector()
 conversation_handler = ConversationHandler()
 
+
 # Generate the landing page
 @app.route("/")
 def index():
     return render_template('index.html')
 
+
 # Receives the user input => generates response
-@app.route('/_communication', methods= ['GET'])
+@app.route('/_communication', methods=['GET'])
 def handle_text_input():
     input_text = request.args.get('text', 0, type=str)
-    print ("User message: %s"  % input_text)
+    print("User message: %s" % input_text)
     response = assistant.get_response(input_text)
-    print ("Assistant response: %s" % response)
+    print("Assistant response: %s" % response)
     return jsonify(assistant_message=response)
 
+
 # Receives the path to image => detects objects in image
-@app.route('/_detect_objects', methods= ['GET'])
+@app.route('/_detect_objects', methods=['GET'])
 def handle_photo_input():
     # Handle inputs
     data = request.args.get('img', 0, type=str)
     label = request.args.get('label', 0, type=str)
-    print ("Provided image data: %s"  % data)
+    print("Provided image data: %s" % data)
 
     # Convert to image
     if '.png' in data or '.jpg' in data:
-        img = Image.open(data) # For demo
+        img = Image.open(data)  # For demo
     else:
-        img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1]))) # For camera
+        img = Image.open(io.BytesIO(base64.b64decode(data.split(',')[1])))  # For camera
 
     # 1: Demo case
     if label == 'monkey':
@@ -70,7 +74,7 @@ def handle_photo_input():
         # 3: Object was not found
         else:
             response = "No %s found in the image." % label
-    print ("Assistant response: %s" % response)
+    print("Assistant response: %s" % response)
     return jsonify(assistant_message=response)
 
 
